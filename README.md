@@ -78,7 +78,7 @@ Android image.
 
 ## Pricing
 
-For pricing information, refer to the "Linux VM" section [here](https://circleci.com/pricing/).
+For pricing information, refer to the Linux machine executors under the “Linux VM" section on the [pricing page](https://circleci.com/pricing/).
 
 ## How to provide feedback
 
