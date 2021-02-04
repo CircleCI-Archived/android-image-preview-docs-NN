@@ -6,7 +6,7 @@ We are excited to announce the preview of an Android machine image on CircleCI. 
 
 CircleCI offers multiple kinds of environments for you to run jobs in. The
 Android machine image can be used via the [Linux `machine` executor](https://circleci.com/docs/2.0/configuration-reference/#machine-executor-linux), like other
-Linux machine images on CircleCI.
+Linux machine images on CircleCI. The Android machine image supports nested virtualization and x86 Android emulators, so it can be used for Android UI testing. It also comes with the Android SDK pre-installed.
 
 ## Pre-installed Software
 
@@ -41,6 +41,7 @@ jobs:
   build:
     machine:
       image: android:202102-01
+    # To optimize build times, we recommend "large" and above for Android-related jobs
     resource_class: large
     steps:
       - checkout
