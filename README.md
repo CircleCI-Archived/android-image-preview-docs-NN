@@ -32,7 +32,8 @@ Linux machine images on CircleCI. The Android machine image supports nested virt
 ## Using the Android machine image
 
 To use the Android machine image, edit your `.circleci/config.yml` file.
-Here is an example config:
+Here is an example config: (Note: we will soon be updating the CircleCI Android orb with convenient commands you can
+use to shorten your config)
 
 ```yaml
 # .circleci/config.yml
