@@ -57,13 +57,51 @@ jobs:
             emulator -avd test -delay-adb -verbose -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           background: true
       - run:
+          name: Generate cache key
+          command: |
+            find . -name 'build.gradle' | sort | xargs cat |
+            shasum | awk '{print $1}' > /tmp/gradle_cache_seed
+      - restore_cache:
+          key: gradle-v1-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
+      - run:
+          # run in parallel with the emulator starting up, to optimize build time
+          name: Run assembleDebugAndroidTest task
+          command: |
+            ./gradlew assembleDebugAndroidTest
+      - run:
           name: Wait for emulator to start
           command: |
             circle-android wait-for-boot
       - run:
-          name: Run UI tests
+          name: Disable emulator animations
           command: |
-            ./gradlew connectedDebugAndroidTest
+            adb shell settings put global window_animation_scale 0.0
+            adb shell settings put global transition_animation_scale 0.0
+            adb shell settings put global animator_duration_scale 0.0
+      - run:
+          name: Run UI tests (with retry)
+          command: |
+            MAX_TRIES=2
+            run_with_retry() {
+               n=1
+               until [ $n -gt $MAX_TRIES ]
+               do
+                  echo "Starting test attempt $n"
+                  ./gradlew connectedDebugAndroidTest && break
+                  n=$[$n+1]
+                  sleep 5
+               done
+               if [ $n -gt $MAX_TRIES ]; then
+                 echo "Max tries reached ($MAX_TRIES)"
+                 exit 1
+               fi
+            }
+            run_with_retry 
+      - save_cache:
+          key: gradle-v1-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
+          paths:
+            - ~/.gradle/caches
+            - ~/.gradle/wrapper
 workflows:
   build:
     jobs:
