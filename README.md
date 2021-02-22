@@ -32,8 +32,112 @@ Linux machine images on CircleCI. The Android machine image supports nested virt
 ## Using the Android machine image
 
 To use the Android machine image, edit your `.circleci/config.yml` file.
-Here is an example config: (Note: we will soon be updating the CircleCI Android orb with convenient commands you can
-use to shorten your config)
+Here are example configs, some of which leverage the circleci/android [orb](https://circleci.com/developer/orbs/orb/circleci/android) for a simplified config. More examples
+are available [here](https://circleci.com/developer/orbs/orb/circleci/android#usage-examples).
+
+### Simple job example
+
+```yaml
+# .circleci/config.yaml
+version: 2.1
+orbs:
+  android: circleci/android@1.0
+workflows:
+  test:
+    jobs:
+      # This job uses the Android machine image by default
+      - android/run-ui-tests:
+          # Use pre-steps and post-steps if necessary
+          # to execute custom steps before and afer any of the built-in steps
+          system-image: system-images;android-29;default;x86
+```
+
+### Example of using the Android machine image in your own job
+
+This example shows how you could modify your existing job to run UI tests.
+
+```yaml
+# .circleci/config.yml
+version: 2.1
+orbs:
+  android: circleci/android@1.0
+jobs:
+  test:
+    # Use the Android machine image
+    executor:
+      name: android/android-machine
+      resource-class: large
+    steps:
+      - checkout
+      # Creates an AVD and starts up the emulator using the AVD.
+      # While the emulator is starting up, the gradle cache will
+      # be restored and the Android app will be assembled.
+      # When the emulator is ready, UI tests will be run.
+      # After the tests are run, the gradle cache will be saved (if it
+      # hasn't been saved before)
+      - android/start-emulator-and-run-tests:
+          system-image: system-images;android-29;default;x86
+      #   The cache prefix can be overridden
+      #   restore-gradle-cache-prefix: v1a
+      #
+      #   The command to be run, while waiting for emulator startup, can be overridden
+      #   post-emulator-launch-assemble-command: ./gradlew assembleDebugAndroidTest
+      #
+      #   The test command can be overridden
+      #   test-command: ./gradlew connectedDebugAndroidTest
+workflows:
+  test:
+    jobs:
+      - test
+```
+
+### Example of using more granular orb commands
+
+This example shows how you can use more granular orb commands to
+achieve what the [start-emulator-and-run-tests](https://circleci.com/developer/orbs/orb/circleci/android#commands-start-emulator-and-run-tests) command does.
+
+```yaml
+# .circleci/config.yml
+version: 2.1
+orbs:
+  android: circleci/android@1.0
+jobs:
+  test:
+    executor:
+      name: android/android-machine
+      resource-class: large
+    steps:
+      - checkout
+      # Create an AVD named "myavd"
+      - android/create-avd:
+          avd-name: myavd
+          system-image: system-images;android-29;default;x86
+          install: true
+      # By default, after starting up the emulator, a cache will be restored,
+      # "./gradlew assembleDebugAndroidTest" will be run and then a script
+      # will be run to wait for the emulator to start up.
+      # Specify the "post-emulator-launch-assemble-command" command to override
+      # the gradle command run, or set "wait-for-emulator" to false to disable
+      # waiting for the emulator altogether.
+      - android/start-emulator:
+          avd-name: myavd
+          no-window: true
+          restore-gradle-cache-prefix: v1a
+      # Runs "./gradlew connectedDebugAndroidTest" by default.
+      # Specify the "test-command" parameter to customize the command run.
+      - android/run-tests
+      - android/save-gradle-cache:
+          cache-prefix: v1a
+workflows:
+  test:
+    jobs:
+      - test
+```
+
+### No-orb example
+
+Here is an example of using the image, without using the circleci/android [orb](https://circleci.com/developer/orbs/orb/circleci/android). These steps are similar
+to what is run when you use the [run-ui-tests](https://circleci.com/developer/orbs/orb/circleci/android#jobs-run-ui-tests) job of the orb.
 
 ```yaml
 # .circleci/config.yml
