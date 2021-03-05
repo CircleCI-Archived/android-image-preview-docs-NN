@@ -12,7 +12,7 @@ Linux machine images on CircleCI. The Android machine image supports nested virt
 
 ### Android SDK
 - sdkmanager
-- Android platform 27, 28, 29, 30
+- Android platform 23, 24, 25, 26, 27, 28, 29, 30, S
 - Build tools 30.0.3
 - emulator, platform-tools, tools
 - NDK (Side-by-side) 21.4.7075529
@@ -22,11 +22,11 @@ Linux machine images on CircleCI. The Android machine image supports nested virt
 ### Others
 - gcloud
 - OpenJDK 8, OpenJDK 11 (default)
-- maven 3.6.3, gradle 6.8, ant
-- nodejs 12.20.1, 14.15.4 (default), 15.6.0
-- python 2.7.18, python 3.9.1
-- ruby 2.7.1, ruby 3.0.0
-- docker 20.10.2, docker-compose 1.28.2
+- maven 3.6.3, gradle 6.8.3, ant
+- nodejs 12.21.0, 14.16.0 (default), 15.11.0
+- python 2.7.18, python 3.9.2
+- ruby 2.7.2, ruby 3.0.0
+- docker 20.10.5, docker-compose 1.28.5
 - jq 1.6
 
 ## Using the Android machine image
